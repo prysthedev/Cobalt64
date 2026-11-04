@@ -23,3 +23,5 @@ The kext target is x86_64. Record the Mac host architecture separately.
 
 The preflight covers the bring-up kext. Mesa, the translator and Metal
 tooling require separate build dependencies and validation.
+
+For a new target PC installation, follow the [baseline macOS and dual-boot guide](BASELINE_MACOS_INSTALL.md).
