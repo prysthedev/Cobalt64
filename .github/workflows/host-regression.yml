@@ -19,6 +19,11 @@ jobs:
           sudo apt-get install -y clang zstd
       - name: Test firmware staging
         run: python3 tools/test-firmware.py -v
+      - name: Test xlat12 register translation and bounds
+        run: |
+          make -C src/xlat12 CC=clang build/test_xlat12 build/fuzz_xlat12
+          src/xlat12/build/test_xlat12
+          src/xlat12/build/fuzz_xlat12 200000
       - name: Test ReBAR planning and source invariants
         shell: bash
         run: |
