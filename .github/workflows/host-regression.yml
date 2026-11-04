@@ -43,6 +43,17 @@ jobs:
             exit 1
           fi
 
+      - name: Test n48xlate C ABI and visible-function linking
+        run: |
+          translator="$RUNNER_TEMP/metal2vulkan"
+          wrapper="$GITHUB_WORKSPACE/third-party/metal2vulkan-n48"
+          git init "$translator"
+          git -C "$translator" fetch --depth=1 https://github.com/steelbrain/metal2vulkan 43c46ac8a24adf1a6e872b8a52c706ec9614fad0
+          git -C "$translator" checkout --detach FETCH_HEAD
+          git -C "$translator" apply "$wrapper"/patches/*.patch
+          cp -R "$wrapper/n48xlate" "$translator/"
+          cargo test --manifest-path "$translator/Cargo.toml" -p n48xlate --test linked --test hooks --features test-hooks
+
   macos-link:
     runs-on: macos-15
     timeout-minutes: 15
