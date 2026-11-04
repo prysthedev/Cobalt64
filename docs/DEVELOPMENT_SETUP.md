@@ -1,5 +1,7 @@
 # Development setup
 
+For copy-paste commands, see the [step-by-step Mac build guide](MAC_BUILD_STEP_BY_STEP.md).
+
 Use a separate Mac for compilation and the target PC for hardware validation.
 The kext target is x86_64. Record the Mac host architecture separately.
 
