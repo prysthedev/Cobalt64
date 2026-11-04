@@ -63,14 +63,22 @@ jobs:
         run: |
           git clone https://github.com/acidanthera/MacKernelSDK.git "$RUNNER_TEMP/MacKernelSDK"
           git -C "$RUNNER_TEMP/MacKernelSDK" checkout --detach 05094e5e88cec7caedbfb35e8449ed0db94bf95b
-      - name: Compile and link Navi48Bringup with synthetic firmware
+      - name: Verify and stage pinned AMD firmware
         shell: bash
         run: |
-          firmware=src/navi48-bringup/firmware
-          mkdir "$firmware"
+          firmware="$RUNNER_TEMP/linux-firmware"
+          base=https://gitlab.com/kernel-firmware/linux-firmware/-/raw/b2722d241309a1872446c1d00c2e812bad055f89
+          mkdir -p "$firmware/amdgpu" "$firmware/LICENSES"
+          curl --fail --silent --show-error --location --retry 3 \
+            "$base/LICENSES/LICENSE.amdgpu" -o "$firmware/LICENSES/LICENSE.amdgpu"
           while read -r name digest; do
-            printf 'CI compile and link fixture only\n' > "$firmware/$name.bin"
+            curl --fail --silent --show-error --location --retry 3 \
+              "$base/amdgpu/$name.bin" -o "$firmware/amdgpu/$name.bin"
           done < tools/firmware-sha256.txt
+          bash tools/fetch-firmware.sh "$firmware"
+      - name: Compile and link Navi48Bringup with verified firmware
+        shell: bash
+        run: |
           log="$RUNNER_TEMP/kext-build.log"
           if ! make -j2 -C src/navi48-bringup MKSDK="$RUNNER_TEMP/MacKernelSDK" all >"$log" 2>&1; then
             tail -80 "$log"
