@@ -1,0 +1,3 @@
+tools/fetch-firmware.sh text eol=lf
+tools/verify-dependencies.sh text eol=lf
+tools/firmware-sha256.txt text eol=lf

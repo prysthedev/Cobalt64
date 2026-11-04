@@ -33,9 +33,11 @@
   sdma_7_0_1.bin  smu_14_0_3.bin
   ```
 
-  The Makefile stops with a list if any is missing. `tools/fetch-firmware.sh` prints the
-  sha256 of each copy against the revision the project was developed with; a different
-  linux-firmware revision may work, but only that one has been run.
+  Run `bash tools/verify-dependencies.sh <path-to-that-checkout>` to check the
+  AMD license file and all ten SHA-256 digests without copying anything.
+  The staging script runs the same preflight before it copies the inputs.
+  For compressed inputs, install zstd. The digest is checked against the
+  decompressed bytes. The Makefile reports any staged files that are missing.
 
 ## Build
 
