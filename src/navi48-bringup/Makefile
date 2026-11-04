@@ -1,7 +1,9 @@
-# Makefile â€” cross-compile Navi48Bringup.kext for x86_64 from any host.
+# Build Navi48Bringup.kext for x86_64 with the macOS toolchain.
 # Reuses RDNA4FB's MacKernelSDK. Targets macOS 11 ABI (loads on 11+, incl. Tahoe).
 #   make          build build/Navi48Bringup.kext
 #   make clean
+
+.DEFAULT_GOAL := all
 
 PRODUCT   := Navi48Bringup
 BUNDLE_ID := com.navi48.bringup
@@ -18,7 +20,7 @@ CXX := clang++
 CC  := clang
 
 CXX_SRCS := src/Navi48Bringup.cpp src/Navi48UserClient.cpp src/Navi48NativeClient.cpp src/Navi48MetalNub.cpp src/Navi48DisplayNub.cpp src/ipdiscovery.cpp src/psp.cpp $(wildcard src/amd/*.cpp) $(wildcard src/apple/*.cpp) $(wildcard src/dcn/*.cpp)
-# Firmware blobs (firmware/*.bin, tracked) are embedded as C arrays generated at build
+# Firmware blobs (firmware/*.bin, staged locally) are embedded as C arrays generated at build
 # time into src/fw/ (gitignored) by tools/embed-firmware.py: symbol fw_<blob>[] + fw_<blob>_size.
 FW_BINS  := $(wildcard firmware/*.bin)
 FW_SRCS  := $(patsubst firmware/%.bin,src/fw/fw_%.c,$(FW_BINS))
