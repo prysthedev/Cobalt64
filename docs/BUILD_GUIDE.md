@@ -1,0 +1,14 @@
+# Baseline build plan
+
+Use the separate Mac for build-only work. Record `sw_vers`, `xcode-select -p`, `clang --version`, `ld -v`, `xcrun --sdk macosx --show-sdk-path` and `python3 --version`. Install the Command Line Tools if absent. The target artifacts are x86_64. Record the Mac host architecture separately.
+
+1. Check out the audited SHA in a clean worktree. Obtain MacKernelSDK from RDNA4FB as specified in BUILDING.md and record the SDK and parent checkout revisions. The public instructions leave that dependency unpinned.
+2. Review linux-firmware's LICENSE.amdgpu before obtaining inputs. Select a revision whose ten uncompressed blobs match the hashes in tools/firmware-sha256.txt. Record the revision and hashes. Run the firmware preflight and staging script as described in BUILDING.md. The preflight rejects a digest mismatch before staging.
+3. Run `make -C src/navi48-bringup MKSDK=/absolute/path/to/MacKernelSDK all`. Capture compiler output, inspect the kext executable with file, dwarfdump and nm, and verify the ad-hoc signature with codesign. Record the result from a second clean checkout before calling the build reproducible.
+4. In a separate Mesa worktree, check out `f5cb8ee032adabef599ae892ec4e42d796b84da9` and use `git am /absolute/path/to/cobalt/mesa-patches/*.patch` in the documented order. Record the resolved Meson and Ninja versions, native dependencies and x86_64 build arguments that produce libvulkan_radeon.dylib. The patch README documents the apply procedure. A verified Darwin build invocation is still needed.
+5. Apply the metal2vulkan patch at `43c46ac8a24adf1a6e872b8a52c706ec9614fad0`, copy the n48xlate crate and run `cargo build --release -p n48xlate` with Rust 1.87 or later, targeting x86_64 for deployment. Follow its NOTICE and retain the license. Use `N48_RADV_LIB`, `N48_VK_INC` and `N48_XLATE_LIB` with tools/native/navi48metal/build.sh. Build navi48accel using its Makefile and mtlprobe using its build script. Precompiled mtlprobe shaders require working metal and metallib tools.
+6. Run fixture-free tests and capture exit codes, then document all fixture-dependent failures separately. Keep generated binaries, AMD firmware, proprietary shader data and kernel collection extracts out of Git.
+
+## Target reproduction gate
+
+Upstream used OpenCore and x86_64 macOS Tahoe 26.6.2 on one RX 9070 XT PC. The target board, subsystem IDs, firmware state, BAR sizes and monitor configuration still need read-only inventory. Establish a known-good baseline macOS boot on the dedicated SSD and verify the Windows boot path independently. Preserve a known-good EFI copy and verify fallback boot media. For the first approved driver trial, use one display, keep auto-arm and multi-display experiments disabled, and document how to boot the fallback EFI after a hang or black screen. Exact OpenCore settings and kext activation steps require source and target verification.
