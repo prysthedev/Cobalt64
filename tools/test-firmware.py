@@ -64,6 +64,13 @@ class FirmwareStaging(unittest.TestCase):
         self.assertIn(diagnostic, result.stderr)
         self.assertFalse(self.destination.exists())
 
+    def test_license_directory(self):
+        moved = self.source / "LICENSES" / self.license.name
+        moved.parent.mkdir()
+        self.license.rename(moved)
+        self.license = moved
+        self.stage()
+
     def test_mismatch(self):
         self.blob.write_bytes(b"wrong")
         self.assert_preflight_failure("SHA-256 mismatch")

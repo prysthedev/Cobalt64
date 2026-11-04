@@ -9,8 +9,8 @@ fi
 
 root="$1"
 tools="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [ ! -s "$root/LICENSE.amdgpu" ]; then
-    echo "Missing or empty AMD license: $root/LICENSE.amdgpu" >&2
+if [ ! -s "$root/LICENSES/LICENSE.amdgpu" ] && [ ! -s "$root/LICENSE.amdgpu" ]; then
+    echo "Missing or empty AMD license: check $root/LICENSES/LICENSE.amdgpu and $root/LICENSE.amdgpu" >&2
     exit 1
 fi
 if command -v shasum >/dev/null 2>&1; then

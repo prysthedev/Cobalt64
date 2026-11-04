@@ -45,5 +45,7 @@ while read -r name want; do
     if [ "$got" = "$want" ]; then echo "ok       $name.bin ($(wc -c < "$DST/$name.bin" | tr -d ' ') bytes)"
     else echo "DIFFERS  $name.bin (sha256 $got; developed against $want)" >&2; exit 1; fi
 done < "$REPO/tools/firmware-sha256.txt"
-cp "$1/LICENSE.amdgpu" "$DST/"
+license="$1/LICENSES/LICENSE.amdgpu"
+if [ ! -s "$license" ]; then license="$1/LICENSE.amdgpu"; fi
+cp "$license" "$DST/"
 echo "copied into $DST"
