@@ -20,10 +20,13 @@
   git -C MacKernelSDK checkout --detach 05094e5e88cec7caedbfb35e8449ed0db94bf95b
   ```
 
-- AMD firmware from linux-firmware (not in this repo, AMD's own licence):
+- AMD firmware from linux-firmware tag 20260622. All ten SHA-256 digests
+  match the build manifest. Review LICENSES/LICENSE.amdgpu before retrieving
+  or staging the blobs:
 
   ```
   git clone https://gitlab.com/kernel-firmware/linux-firmware.git
+  git -C linux-firmware checkout --detach b2722d241309a1872446c1d00c2e812bad055f89
   tools/fetch-firmware.sh <path-to-that-checkout>
   ```
 
