@@ -12,3 +12,24 @@ Use the separate Mac for build-only work. Record `sw_vers`, `xcode-select -p`, `
 ## Target reproduction gate
 
 Upstream used OpenCore and x86_64 macOS Tahoe 26.6.2 on one RX 9070 XT PC. The target board, subsystem IDs, firmware state, BAR sizes and monitor configuration still need read-only inventory. Establish a known-good baseline macOS boot on the dedicated SSD and verify the Windows boot path independently. Preserve a known-good EFI copy and verify fallback boot media. For the first approved driver trial, use one display, keep auto-arm and multi-display experiments disabled, and document how to boot the fallback EFI after a hang or black screen. Exact OpenCore settings and kext activation steps require source and target verification.
+
+### Darwin RADV configure candidate
+
+Run this in the patched Mesa checkout on an x86_64 macOS build environment.
+Use an x86_64 compiler environment and x86_64 dependencies if building on an
+Apple Silicon Mac. Record Meson, Ninja, Apple Clang and SDK versions with the
+configuration and compile logs.
+
+```sh
+meson setup build-x86_64 \
+  -Dvulkan-drivers=amd -Dplatforms=macos -Dgallium-drivers=[] \
+  -Dopengl=false -Degl=disabled -Dglx=disabled -Dgbm=disabled -Dllvm=disabled
+meson compile -C build-x86_64
+lipo -verify_arch x86_64 build-x86_64/src/amd/vulkan/libvulkan_radeon.dylib
+```
+
+These options are present at the patched Mesa revision. The build selects the
+Darwin AMD backend when the Meson host system is Darwin and the AMD Vulkan
+driver is enabled. The configuration and compilation have yet to be exercised
+on macOS. Once the dylib passes the architecture check, pass its absolute path
+as N48_RADV_LIB when building Navi48Metal.
