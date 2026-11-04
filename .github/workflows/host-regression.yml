@@ -1,0 +1,29 @@
+name: Host regression tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  host-regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install host test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang zstd
+      - name: Test firmware staging
+        run: python3 tools/test-firmware.py -v
+      - name: Test ReBAR planning and source invariants
+        run: |
+          clang++ -std=c++17 -Wall -Wextra -Werror -O1 \
+            -fsanitize=address,undefined -fno-sanitize-recover=all \
+            -I src/navi48-bringup/src -I src/navi48-bringup/src/amd \
+            src/navi48-bringup/tests/native_rebar_test.cpp \
+            -o "$RUNNER_TEMP/native_rebar"
+          "$RUNNER_TEMP/native_rebar" .
