@@ -23,6 +23,11 @@ SRC="$1/amdgpu"
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DST="$REPO/src/navi48-bringup/firmware"
 bash "$REPO/tools/verify-dependencies.sh" "$1"
+if command -v shasum >/dev/null 2>&1; then
+    checksum=(shasum -a 256)
+else
+    checksum=(sha256sum)
+fi
 mkdir -p "$DST"
 
 while read -r name want; do
@@ -35,7 +40,8 @@ while read -r name want; do
         echo "MISSING  $name.bin (not in $SRC)" >&2
         exit 1
     fi
-    got="$(shasum -a 256 "$DST/$name.bin" | awk '{print $1}')"
+    digest="$("${checksum[@]}" < "$DST/$name.bin")"
+    got="${digest%% *}"
     if [ "$got" = "$want" ]; then echo "ok       $name.bin ($(wc -c < "$DST/$name.bin" | tr -d ' ') bytes)"
     else echo "DIFFERS  $name.bin (sha256 $got; developed against $want)" >&2; exit 1; fi
 done < "$REPO/tools/firmware-sha256.txt"
