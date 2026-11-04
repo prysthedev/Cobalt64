@@ -42,3 +42,32 @@ jobs:
             done || true
             exit 1
           fi
+
+  macos-link:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch pinned MacKernelSDK
+        run: |
+          git clone https://github.com/acidanthera/MacKernelSDK.git "$RUNNER_TEMP/MacKernelSDK"
+          git -C "$RUNNER_TEMP/MacKernelSDK" checkout --detach 05094e5e88cec7caedbfb35e8449ed0db94bf95b
+      - name: Compile and link Navi48Bringup with synthetic firmware
+        shell: bash
+        run: |
+          firmware=src/navi48-bringup/firmware
+          mkdir "$firmware"
+          while read -r name digest; do
+            printf 'CI compile and link fixture only\n' > "$firmware/$name.bin"
+          done < tools/firmware-sha256.txt
+          log="$RUNNER_TEMP/kext-build.log"
+          if ! make -j2 -C src/navi48-bringup MKSDK="$RUNNER_TEMP/MacKernelSDK" all >"$log" 2>&1; then
+            tail -80 "$log"
+            grep -E 'error:|No rule to make target' "$log" | head -20 | while IFS= read -r line; do
+              printf '::error::%s\n' "$line"
+            done || true
+            exit 1
+          fi
+          kext=src/navi48-bringup/build/Navi48Bringup.kext
+          lipo -verify_arch x86_64 "$kext/Contents/MacOS/Navi48Bringup"
+          codesign --verify "$kext"
