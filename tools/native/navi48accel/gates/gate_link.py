@@ -10,7 +10,7 @@
   C  the generated header is fresh (regenerated into a temp dir == the committed one) and check_layout.py (test subclasses of the 9 family classes
      against the KC vtables: slot count, slot order, exact symbols) still says MATCH.
 Usage: gate_link.py <linked kext binary> <object file>"""
-import os, re, subprocess, sys, tempfile, hashlib
+import os, re, shutil, subprocess, sys, tempfile, hashlib
 from common import *
 import kextimg
 import exports
@@ -62,18 +62,23 @@ def gate_b(k):
 
 def gate_c():
     problems = []
-    tmp = tempfile.mkdtemp(prefix='n48gen')
-    env = dict(os.environ, N48_GEN_OUT=tmp)
-    r = subprocess.run([sys.executable, os.path.join(LAYOUT, 'gen_header.py')], env=env, capture_output=True, text=True)
-    if r.returncode:
-        problems.append('gen_header.py failed: ' + r.stderr[-300:])
-    else:
-        a = open(os.path.join(tmp, 'IOAccelFamily2_decl.h'), 'rb').read()
-        b = open(os.path.join(LAYOUT, 'generated', 'IOAccelFamily2_decl.h'), 'rb').read()
-        if a != b:
-            problems.append('generated/IOAccelFamily2_decl.h is STALE (regenerating gives a different file): run tools/native/ioaccel-layout/gen_header.py')
+    with tempfile.TemporaryDirectory(prefix='n48gen') as tmp:
+        shutil.copyfile(os.path.join(LAYOUT, 'generated', 'model.json'),
+                        os.path.join(tmp, 'model.json'))
+        env = dict(os.environ, C64_LAYOUT_OUT=tmp)
+        r = subprocess.run([sys.executable, os.path.join(LAYOUT, 'gen_header.py')],
+                           env=env, capture_output=True, text=True)
+        if r.returncode:
+            problems.append('gen_header.py failed: ' + r.stderr[-300:])
         else:
-            print('  C generated header fresh: sha256 %s' % hashlib.sha256(a).hexdigest()[:16])
+            with open(os.path.join(tmp, 'IOAccelFamily2_decl.h'), 'rb') as fresh:
+                a = fresh.read()
+            with open(os.path.join(LAYOUT, 'generated', 'IOAccelFamily2_decl.h'), 'rb') as current:
+                b = current.read()
+            if a != b:
+                problems.append('generated/IOAccelFamily2_decl.h is STALE: run tools/ioaccel-layout/gen_header.py')
+            else:
+                print('  C generated header fresh: sha256 %s' % hashlib.sha256(a).hexdigest()[:16])
     cl = subprocess.run([sys.executable, os.path.join(LAYOUT, 'check_layout.py')], capture_output=True, text=True)
     last = [l for l in cl.stdout.splitlines() if l.startswith(('MATCH', 'MISMATCH', 'COMPILE'))]
     print('  C check_layout.py: ' + (last[-1] if last else 'no verdict'))

@@ -60,3 +60,17 @@ Memory: `kcmod.Image` reads each input file into memory (the system KC is about 
 - `kcmod.KERNEL_BASE` (`0xffffff8000100000`) is the level-0 chained-fixup base. It was verified against
   `___cxa_pure_virtual` on macOS 26.x. If `check_layout.py` reports nonsense on another OS build, check this first.
 - Tested only on macOS 26.6.2 (25G83) x86_64. Other builds have not been tried.
+
+
+## Generate inputs for Navi48Accel
+
+For the auxiliary kext, set `C64_LAYOUT_OUT="$PWD/generated"` while running
+the three commands above from this directory. Keep the generated directory
+local. After check_layout.py reports MATCH, run from the repository root:
+
+```sh
+make -C tools/native/navi48accel MKSDK="$C64_MKSDK" all
+```
+
+Keep C64_WORK set to the same matching kernel collections and extracted
+Mach-O inputs during the build so the link and layout gates can read them.
