@@ -2,3 +2,4 @@ tools/fetch-firmware.sh text eol=lf
 tools/verify-dependencies.sh text eol=lf
 tools/firmware-sha256.txt text eol=lf
 tools/setup-dev.sh text eol=lf
+third-party/metal2vulkan-n48/patches/*.patch text eol=lf
