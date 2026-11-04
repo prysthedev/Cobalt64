@@ -55,7 +55,7 @@ jobs:
           cargo test --manifest-path "$translator/Cargo.toml" -p n48xlate --test linked --test hooks --features test-hooks
 
   macos-link:
-    runs-on: macos-15
+    runs-on: macos-15-intel
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
