@@ -28,7 +28,7 @@ jobs:
             -I src/navi48-bringup/src -I src/navi48-bringup/src/amd \
             src/navi48-bringup/tests/native_rebar_test.cpp \
             -o "$RUNNER_TEMP/native_rebar" &&
-            "$RUNNER_TEMP/native_rebar" .; } >"$log" 2>&1; then
+            "$RUNNER_TEMP/native_rebar" . --public-checkout; } >"$log" 2>&1; then
             cat "$log"
           else
             cat "$log"

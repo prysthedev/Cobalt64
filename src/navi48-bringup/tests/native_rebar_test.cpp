@@ -437,7 +437,16 @@ static void p10_pins664(const std::string &root) {
 
 int main(int argc, char **argv) {
     const std::string root = argc > 1 ? argv[1] : ".";
-    p1_plan(); p2_census(); p3_pure(); p4_high(); p8_identity(); p9_variants(root); p3b_layout(); p10_pins664(root); p5_pins(root); p6_vramstat(root); p7_mesa(root);
+    if (argc > 3 || (argc == 3 && std::strcmp(argv[2], "--public-checkout") != 0)) {
+        std::fprintf(stderr, "usage: %s [root [--public-checkout]]\n", argv[0]);
+        return 2;
+    }
+    p1_plan(); p2_census(); p3_pure(); p4_high(); p8_identity();
+    if (argc == 3)
+        std::puts("P9 NOT RUN: public checkout lacks upstream OpenCore variant fixtures");
+    else
+        p9_variants(root);
+    p3b_layout(); p10_pins664(root); p5_pins(root); p6_vramstat(root); p7_mesa(root);
     std::printf("native_rebar_test: %d checks, %d failed\n", gRun, gFail);
     return gFail == 0 ? 0 : 1;
 }

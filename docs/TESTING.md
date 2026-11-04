@@ -12,3 +12,8 @@ Run build-only and host tests on the separate Mac. Record the source revision, m
 | Target driver integration | Capture driver logs and actual PCI identity, BAR lengths, VRAM, buffer lifecycle, submission, fence and known readback | Requires a recoverable target boot and approval before loading the experimental kext. |
 
 Classify missing tools and fixtures separately from assertion failures. Keep local Apple-derived inputs out of commits. Track each stage in HARDWARE_TEST_LOG.md.
+
+The Linux CI invokes native_rebar_test with `--public-checkout`. This reports
+P9 separately because upstream's OpenCore variant and rescue plists are absent.
+The default invocation still requires those fixtures and checks their exact
+content. The optional Mesa source pins retain their existing behavior.
