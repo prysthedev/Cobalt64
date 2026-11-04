@@ -7,7 +7,7 @@
 | Target board | Windows BIOS registry reports B850 AORUS ELITE WIFI7 ICE, BIOS F7d |
 | GPU | Windows PnP reports 1002:7550, subsystem 1DA2:3490, revision C0 |
 | Driver matching | Pinned kext plist includes 0x75501002 |
-| BAR lengths and ReBAR | Pending. Windows PnP enumeration returned no resource ranges in this session. |
+| BAR lengths and ReBAR | Windows CIM reported assigned memory ranges of 256 MiB above 4 GiB and 1 MiB below 4 GiB for PCI bus 3, device 0, function 0. BAR indices and ReBAR capability remain unverified. |
 | macOS and recovery | Target build and fallback boot pending |
 
 ## Run record
