@@ -18,7 +18,7 @@ COMMON  := -arch $(ARCH) -target $(ARCH)-apple-macos$(DEPLOY) -isysroot $(SDK) -
   -D_FORTIFY_SOURCE=0 -nostdinc -fno-builtin -fno-common -fno-stack-protector -mkernel -fapple-kext -Wall -Os -g
 CXXFLAGS := $(COMMON) -std=c++17 -fno-exceptions -fno-rtti -fcheck-new -fno-c++-static-destructors
 LDFLAGS := -arch $(ARCH) -target $(ARCH)-apple-macos$(DEPLOY) -isysroot $(SDK) \
-  -nostdlib -Xlinker -kext -L$(MKSDK)/Library/x86_64 -lkmodc++ -lkmod -Wl,-no_deduplicate
+  -nostdlib -Xlinker -kext -L$(MKSDK)/Library/x86_64 -L$(MKSDK)/Library/universal -lkmodc++ -lkmod -Wl,-no_deduplicate
 GENHDR  := $(LAYOUT)/generated/IOAccelFamily2_decl.h
 
 all: $(KEXT) gates

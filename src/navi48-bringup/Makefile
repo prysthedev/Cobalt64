@@ -1,4 +1,4 @@
-# Makefile — cross-compile Navi48Bringup.kext for x86_64 from any host.
+# Makefile â€” cross-compile Navi48Bringup.kext for x86_64 from any host.
 # Reuses RDNA4FB's MacKernelSDK. Targets macOS 11 ABI (loads on 11+, incl. Tahoe).
 #   make          build build/Navi48Bringup.kext
 #   make clean
@@ -107,7 +107,7 @@ COMMON := -arch $(ARCH) -target $(ARCH)-apple-macos$(DEPLOY) -isysroot $(SDK) \
 CXXFLAGS := $(COMMON) -std=c++17 -fno-exceptions -fno-rtti -fcheck-new -fno-c++-static-destructors
 CFLAGS   := $(COMMON)
 LDFLAGS  := -arch $(ARCH) -target $(ARCH)-apple-macos$(DEPLOY) -isysroot $(SDK) \
-  -nostdlib -Xlinker -kext -L$(MKSDK)/Library/x86_64 -lkmodc++ -lkmod -Wl,-no_deduplicate
+  -nostdlib -Xlinker -kext -L$(MKSDK)/Library/x86_64 -L$(MKSDK)/Library/universal -lkmodc++ -lkmod -Wl,-no_deduplicate
 
 all: $(KEXT)
 
@@ -171,12 +171,12 @@ $(KEXT): $(OBJS) Info.plist
 	$(CXX) $(LDFLAGS) $(OBJS) -o $(EXEC)
 	@# A virtual declared in one of our own classes but defined nowhere links
 	@# fine here and then fails in the KERNEL linker, where the only symptom is
-	@# that the kext silently does not load — no message in dmesg, none in the
+	@# that the kext silently does not load â€” no message in dmesg, none in the
 	@# unified log, nothing on the ESP to see. 0.0.39 shipped that way because
 	@# ~AmdTtlServicesABI() had no body. Catch it at build time instead.
 	@bad=$$(nm -u -arch $(ARCH) $(EXEC) | c++filt | grep -E 'Navi48|AmdTtl|amdgpu::|n48::|n48dcn::|xlat12|_sc_|dcn41_' || true); \
 	if [ -n "$$bad" ]; then \
-	  echo "LINK ERROR: these symbols are OURS but undefined — the kext will not load:"; \
+	  echo "LINK ERROR: these symbols are OURS but undefined â€” the kext will not load:"; \
 	  echo "$$bad" | sed 's/^/    /'; \
 	  rm -f $(EXEC); exit 1; \
 	fi

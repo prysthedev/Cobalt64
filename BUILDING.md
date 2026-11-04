@@ -9,13 +9,17 @@
 ## Prerequisites
 
 - macOS with the Xcode Command Line Tools (clang, make, codesign, python3).
-- MacKernelSDK, taken from the RDNA4FB clone (not vendored here):
+- MacKernelSDK from the RDNA4FB project's successor, AMDRadeonRDNA4.kext.
+  Its SDK submodule at parent commit `49f7f20c00dd154384418078f8a09e79c400a06a`
+  points to the following revision. Clone the SDK directly and pass its path
+  as MKSDK. This pin is verified against the published tree. A macOS link
+  test with it is still pending.
 
   ```
-  git clone https://github.com/somestupidgirl/RDNA4FB
+  git clone https://github.com/acidanthera/MacKernelSDK.git
+  git -C MacKernelSDK checkout --detach 05094e5e88cec7caedbfb35e8449ed0db94bf95b
   ```
 
-  and pass its MacKernelSDK directory as MKSDK below.
 - AMD firmware from linux-firmware (not in this repo, AMD's own licence):
 
   ```

@@ -21,12 +21,18 @@ for tool in make codesign python3 git; do
         exit 1
     fi
 done
-for input in Headers/IOKit/IOService.h Library/x86_64/libkmodc++.a Library/x86_64/libkmod.a; do
+for input in Headers/IOKit/IOService.h Library/x86_64/libkmod.a; do
     if [ ! -f "$1/$input" ]; then
         echo "Missing SDK input: $1/$input. Pass the MacKernelSDK directory." >&2
         exit 1
     fi
 done
+
+if [ ! -f "$1/Library/x86_64/libkmodc++.a" ] &&
+   [ ! -f "$1/Library/universal/libkmodc++.a" ]; then
+    echo "Missing libkmodc++.a under $1/Library/{x86_64,universal}." >&2
+    exit 1
+fi
 
 sw_vers
 uname -m
